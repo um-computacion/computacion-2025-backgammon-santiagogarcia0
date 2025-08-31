@@ -1,3 +1,5 @@
+Santiago García
+
 # Backgammon
 
 Proyecto de implementación del juego Backgammon en Python.
