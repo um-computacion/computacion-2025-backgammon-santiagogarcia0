@@ -20,3 +20,25 @@ class TestDice(unittest.TestCase):
         dice = Dice()
         dice.roll()
         self.assertIsNotNone(dice._Dice__last_roll)  # atributo privado con name mangling
+
+class TestPlayer(unittest.TestCase):
+
+    def test_player_initialization(self):
+        player = Player("Santiago", 15)
+        self.assertEqual(player._Player__name, "Santiago")
+        self.assertEqual(player._Player__checkers, 15)
+
+    def test_move_checker_reduces_checkers(self):
+        player = Player("Santiago", 5)
+        player.move_checker()
+        self.assertEqual(player._Player__checkers, 4)
+
+    def test_cannot_move_more_checkers_than_owned(self):
+        player = Player("Santiago", 1)
+        player.move_checker()
+        with self.assertRaises(ValueError):
+            player.move_checker()
+
+
+if __name__ == "__main__":
+    unittest.main()
