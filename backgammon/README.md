@@ -8,6 +8,7 @@ Proyecto de implementación del juego Backgammon en Python.
 - CLI (línea de comando) simplificada
 - Clases centrales implementadas: `Game`, `Board`, `Player`, `Dice`
 - Setup inicial de tablero y turnos
+- Tests en desarrollo
 
 ## Estructura del proyecto
 /backgammon/
