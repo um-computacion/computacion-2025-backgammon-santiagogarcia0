@@ -2,15 +2,15 @@ import unittest
 from unittest.mock import patch
 from backgammon.cli.cli import CLI
 from backgammon.core.player import Player
-from backgammon.core.backgammon_game import BackgammonGame
-
+from backgammon.core.game import Game
 
 class TestCLI(unittest.TestCase):
     def setUp(self):
         self.cli = CLI()
         player1 = Player("Jugador1")
         player2 = Player("Jugador2")
-        self.cli.game = BackgammonGame([player1, player2])
+        self.cli.game = Game(player1, player2)
+        self.cli.game.start_game()
 
     @patch("builtins.input", side_effect=["1"])
     def test_tirar_dados(self, mock_input):
@@ -25,3 +25,6 @@ class TestCLI(unittest.TestCase):
     def test_salir(self, mock_input):
         with self.assertRaises(SystemExit):
             self.cli.show_menu()
+
+if __name__ == "__main__":
+    unittest.main()
