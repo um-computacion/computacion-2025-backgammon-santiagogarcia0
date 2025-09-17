@@ -11,13 +11,18 @@ class Dice:
     """
 
     def __init__(self):
-        self.__values__ = (0, 0)
+        self.last_roll = (0, 0)
 
     def roll(self):
         """Lanza los dos dados y guarda sus valores."""
-        self.__values__ = (random.randint(1, 6), random.randint(1, 6))
-        return self.__values__
+        self.last_roll = (random.randint(1, 6), random.randint(1, 6))
+        return self.last_roll
+
+    def roll_double(self):
+        """Lanza dos dados iguales para movimientos especiales."""
+        self.last_roll = (random.randint(1, 6), random.randint(1, 6))
+        return self.last_roll
 
     def get_values(self):
         """Devuelve la última tirada."""
-        return self.__values__
+        return self.last_roll
