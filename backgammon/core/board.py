@@ -12,12 +12,10 @@ class Board:
     def __init__(self):
         self.points = {i: [] for i in range(1, 25)}
         self._initialize_checkers()
-        # Fichas capturadas y borneadas
         self.bar = {}
         self.borne_off = {}
 
     def _initialize_checkers(self):
-        """Coloca las fichas en posiciones iniciales estándar (simplificado)."""
         self.points[1] = ['B'] * 2
         self.points[12] = ['B'] * 5
         self.points[17] = ['B'] * 3
@@ -31,14 +29,13 @@ class Board:
     def setup_board(self, players):
         self.points[1] = [players[0].name] * 15
         self.points[24] = [players[1].name] * 15
-        # Inicializa estructuras de bar y borneado
         self.bar = {players[0].name: [], players[1].name: []}
         self.borne_off = {players[0].name: [], players[1].name: []}
 
     def can_move(self, player, from_point, to_point):
         if from_point < 1 or from_point > 24:
             return False
-        if to_point < 0 or to_point > 25:  # ahora soporta 0 y 25 para borneado
+        if to_point < 0 or to_point > 25:
             return False
         if not self.points[from_point] or self.points[from_point][0] != player.name:
             return False
@@ -53,6 +50,12 @@ class Board:
             self.points[from_point].remove(player.name)
             self.borne_off[player.name].append(player.name)
             return True
+
+        # Golpe (hit): capturar ficha solitaria del rival
+        if self.points[to_point] and self.points[to_point][0] != player.name and len(self.points[to_point]) == 1:
+            opponent = self.points[to_point][0]
+            captured = self.points[to_point].pop()
+            self.bar[opponent].append(captured)
 
         # Movimiento normal
         self.points[from_point].remove(player.name)
