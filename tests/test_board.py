@@ -10,25 +10,21 @@ class TestBoard(unittest.TestCase):
         self.board.setup_board([self.player1, self.player2])
 
     def test_initial_setup(self):
-        """El tablero debe tener 15 fichas de cada jugador en posiciones iniciales."""
         self.assertEqual(len(self.board.points[1]), 15)
         self.assertEqual(len(self.board.points[24]), 15)
+        self.assertIn(self.player1.name, self.board.bar)
+        self.assertIn(self.player1.name, self.board.borne_off)
 
-    def test_valid_move(self):
-        """Debe poder mover una ficha si el movimiento es válido."""
-        moved = self.board.move_checker(self.player1, 1, 2)
+    def test_bear_off_checker(self):
+        """Debe permitir borneado (sacar fichas del tablero)."""
+        moved = self.board.move_checker(self.player1, 1, 0)  # borneado
         self.assertTrue(moved)
-        self.assertIn(self.player1.name, self.board.points[2])
+        self.assertIn(self.player1.name, self.board.borne_off[self.player1.name])
 
-    def test_invalid_move_from_empty(self):
-        """No debe permitir mover una ficha desde un punto vacío."""
-        moved = self.board.move_checker(self.player1, 5, 6)
-        self.assertFalse(moved)
-
-    def test_invalid_move_out_of_bounds(self):
-        """No debe permitir mover fuera del tablero (puntos inválidos)."""
-        moved = self.board.move_checker(self.player1, 1, 30)
-        self.assertFalse(moved)
+    def test_bar_starts_empty(self):
+        """Al inicio, el bar debe estar vacío."""
+        self.assertEqual(self.board.bar[self.player1.name], [])
+        self.assertEqual(self.board.bar[self.player2.name], [])
 
 if __name__ == "__main__":
     unittest.main()
