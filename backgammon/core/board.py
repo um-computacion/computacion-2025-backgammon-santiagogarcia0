@@ -35,17 +35,27 @@ class Board:
         self.points[1] = [players[0].name] * 15
         self.points[24] = [players[1].name] * 15
 
-    def move_checker(self, player, from_point, to_point):
-        """Mueve una ficha de un punto a otro si es válido."""
-        if self.is_valid_move(player, from_point, to_point):
-            self.points[from_point].remove(player.name)
-            self.points[to_point].append(player.name)
-            return True
-        return False
+    def can_move(self, player, from_point, to_point):
+        """
+        Verifica si un movimiento es legal de manera básica.
+        - El origen debe tener fichas del jugador.
+        - El destino debe estar dentro del rango 1–24.
+        """
+        if from_point < 1 or from_point > 24:
+            return False
+        if to_point < 1 or to_point > 24:
+            return False
+        if not self.points[from_point] or self.points[from_point][0] != player.name:
+            return False
+        return True
 
-    def is_valid_move(self, player, from_point, to_point):
-        """Valida un movimiento de manera simplificada."""
-        return player.name in self.points[from_point]
+    def move_checker(self, player, from_point, to_point):
+        """Mueve una ficha si el movimiento es válido."""
+        if not self.can_move(player, from_point, to_point):
+            return False
+        self.points[from_point].remove(player.name)
+        self.points[to_point].append(player.name)
+        return True
 
     def __str__(self):
         """Representación simplificada del tablero."""

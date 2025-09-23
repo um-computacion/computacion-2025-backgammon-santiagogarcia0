@@ -20,15 +20,15 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(moved)
         self.assertIn(self.player1.name, self.board.points[2])
 
-    def test_invalid_move(self):
-        """No debe permitir mover una ficha de una posición vacía."""
+    def test_invalid_move_from_empty(self):
+        """No debe permitir mover una ficha desde un punto vacío."""
         moved = self.board.move_checker(self.player1, 5, 6)
         self.assertFalse(moved)
 
-    def test_no_mas_de_15_fichas(self):
-        """No debe permitir más de 15 fichas en posición inicial (simplificado)."""
-        self.assertLessEqual(len(self.board.points[1]), 15)
-        self.assertLessEqual(len(self.board.points[24]), 15)
+    def test_invalid_move_out_of_bounds(self):
+        """No debe permitir mover fuera del tablero (puntos inválidos)."""
+        moved = self.board.move_checker(self.player1, 1, 30)
+        self.assertFalse(moved)
 
 if __name__ == "__main__":
     unittest.main()
