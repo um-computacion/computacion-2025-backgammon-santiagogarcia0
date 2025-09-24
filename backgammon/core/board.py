@@ -32,18 +32,30 @@ class Board:
         self.bar = {players[0].name: [], players[1].name: []}
         self.borne_off = {players[0].name: [], players[1].name: []}
 
-    def can_move(self, player, from_point, to_point):
+    def can_move(self, player, from_point, to_point, dice_rolls):
+        """Valida si el movimiento es legal según las reglas básicas y dados."""
         if from_point < 1 or from_point > 24:
             return False
         if to_point < 0 or to_point > 25:
             return False
         if not self.points[from_point] or self.points[from_point][0] != player.name:
             return False
+
+        # Validar distancia con dados
+        distance = abs(to_point - from_point)
+        if distance not in dice_rolls and to_point not in (0, 25):
+            return False
+
         return True
 
-    def move_checker(self, player, from_point, to_point):
-        if not self.can_move(player, from_point, to_point):
+    def move_checker(self, player, from_point, to_point, dice_rolls):
+        """Mueve ficha si el movimiento es válido con los dados disponibles."""
+        if not self.can_move(player, from_point, to_point, dice_rolls):
             return False
+
+        distance = abs(to_point - from_point)
+        if distance in dice_rolls:
+            dice_rolls.remove(distance)
 
         # Borneado
         if to_point == 0 or to_point == 25:
@@ -51,7 +63,7 @@ class Board:
             self.borne_off[player.name].append(player.name)
             return True
 
-        # Golpe (hit): capturar ficha solitaria del rival
+        # Golpe (hit)
         if self.points[to_point] and self.points[to_point][0] != player.name and len(self.points[to_point]) == 1:
             opponent = self.points[to_point][0]
             captured = self.points[to_point].pop()

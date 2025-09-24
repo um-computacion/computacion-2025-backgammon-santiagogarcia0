@@ -3,11 +3,8 @@ Módulo CLI
 Provee una interfaz de línea de comandos básica para jugar Backgammon.
 """
 
-from backgammon.core.dice import Dice
 from backgammon.core.player import Player
-from backgammon.core.board import Board
-from backgammon.core.backgammon_game import BackgammonGame
-
+from backgammon.core.game import Game
 
 class CLI:
     def __init__(self):
@@ -21,7 +18,8 @@ class CLI:
         player1 = Player(name1)
         player2 = Player(name2)
 
-        self.game = BackgammonGame([player1, player2])
+        self.game = Game(player1, player2)
+        self.game.start_game()
 
         while True:
             self.show_menu()
@@ -40,29 +38,21 @@ class CLI:
             print(f"Dados: {roll}")
 
         elif opcion == "2":
-            jugador = self.game.current_player()
-            print(f"Turno de {jugador.get_name()}")
+            jugador = self.game.current_player
+            print(f"Turno de {jugador.name}")
             from_point = int(input("Mover desde punto: "))
             to_point = int(input("Mover a punto: "))
-            moved = self.game.get_board().move_checker(jugador, from_point, to_point)
+            moved = self.game.move(from_point, to_point)
             if moved:
                 print("Movimiento realizado ✅")
-                self.game.next_turn()
             else:
                 print("Movimiento inválido ❌")
 
         elif opcion == "3":
-            self.print_board()
+            print(self.game.board)
 
         elif opcion == "4":
             print("👋 Gracias por jugar Backgammon!")
             exit()
         else:
             print("Opción inválida, intenta nuevamente.")
-
-    def print_board(self):
-        board = self.game.get_board().get_points()
-        print("\nEstado del tablero:")
-        for point, checkers in board.items():
-            if checkers:
-                print(f"{point}: {checkers}")

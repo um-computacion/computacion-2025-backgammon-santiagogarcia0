@@ -21,18 +21,30 @@ class Game:
             player2 if player2 else Player("Jugador 2")
         ]
         self.current_turn_index = 0
+        self.available_moves = []
 
     def start_game(self):
         """Inicializa el tablero con fichas de ambos jugadores."""
         self.board.setup_board(self.players)
 
     def roll_dice(self):
-        """Lanza los dados y retorna los valores obtenidos."""
-        return self.dice.roll()
+        """Lanza los dados y configura movimientos disponibles."""
+        roll = self.dice.roll()
+        self.available_moves = list(roll) if roll[0] != roll[1] else [roll[0]] * 4
+        return roll
+
+    def move(self, from_point, to_point):
+        """Intenta mover ficha y consume la tirada usada."""
+        player = self.current_player
+        success = self.board.move_checker(player, from_point, to_point, self.available_moves)
+        if success and not self.available_moves:  # Sin movimientos -> cambiar turno
+            self.next_turn()
+        return success
 
     def next_turn(self):
         """Cambia el turno al siguiente jugador."""
         self.current_turn_index = (self.current_turn_index + 1) % len(self.players)
+        self.available_moves = []
 
     @property
     def current_player(self):
