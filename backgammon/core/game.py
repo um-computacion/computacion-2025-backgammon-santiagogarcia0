@@ -37,8 +37,13 @@ class Game:
         """Intenta mover ficha y consume la tirada usada."""
         player = self.current_player
         success = self.board.move_checker(player, from_point, to_point, self.available_moves)
-        if success and not self.available_moves:  # Sin movimientos -> cambiar turno
-            self.next_turn()
+        if success:
+            winner = self.check_winner()
+            if winner:
+                print(f"🏆 {winner.name} ha ganado la partida!")
+                exit()
+            if not self.available_moves:
+                self.next_turn()
         return success
 
     def next_turn(self):
@@ -51,6 +56,13 @@ class Game:
         """Devuelve el jugador que tiene el turno actual."""
         return self.players[self.current_turn_index]
 
+    def check_winner(self):
+        """Devuelve el jugador ganador si ya borneó todas sus fichas."""
+        for player in self.players:
+            if len(self.board.borne_off[player.name]) == 15:
+                return player
+        return None
+
     def is_finished(self):
         """Determina si el juego terminó (un jugador se quedó sin fichas)."""
-        return any(player.has_won() for player in self.players)
+        return self.check_winner() is not None
