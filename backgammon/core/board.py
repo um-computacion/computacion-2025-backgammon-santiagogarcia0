@@ -41,11 +41,9 @@ class Board:
         if not self.points[from_point] or self.points[from_point][0] != player.name:
             return False
 
-        # Validar distancia con dados
         distance = abs(to_point - from_point)
         if distance not in dice_rolls and to_point not in (0, 25):
             return False
-
         return True
 
     def move_checker(self, player, from_point, to_point, dice_rolls):
@@ -74,8 +72,14 @@ class Board:
         self.points[to_point].append(player.name)
         return True
 
+    def get_bar(self):
+        return self.bar
+
+    def get_borne_off(self):
+        return self.borne_off
+
     def __str__(self):
-        board_str = ""
+        board_str = "\n=== Tablero ===\n"
         for i in range(1, 25):
             board_str += f"{i}: {self.points[i]}\n"
         return board_str

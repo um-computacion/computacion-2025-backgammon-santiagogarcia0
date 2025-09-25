@@ -49,10 +49,21 @@ class CLI:
                 print("Movimiento inválido ❌")
 
         elif opcion == "3":
-            print(self.game.board)
+            self.print_board()
 
         elif opcion == "4":
             print("👋 Gracias por jugar Backgammon!")
             exit()
         else:
             print("Opción inválida, intenta nuevamente.")
+
+    def print_board(self):
+        print(self.game.board)
+
+        print("\n=== Bar ===")
+        for player, captured in self.game.board.get_bar().items():
+            print(f"{player}: {captured}")
+
+        print("\n=== Borne Off ===")
+        for player, borne in self.game.board.get_borne_off().items():
+            print(f"{player}: {borne}")
