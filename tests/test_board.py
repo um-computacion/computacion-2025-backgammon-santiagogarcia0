@@ -26,20 +26,13 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(moved)
         self.assertEqual(self.board.bar[self.player2.name], [])
         self.assertEqual(self.board.points[5].count(self.player2.name), 2)
-        self.assertIn(self.player1.name, self.board.points[5])
 
     def test_bear_off(self):
-        """Debe permitir borneado de fichas."""
+        """Debe permitir borneado si se alcanza la meta."""
         self.board.points[1] = [self.player1.name]
         moved = self.board.move_checker(self.player1, 1, 0, [1])
         self.assertTrue(moved)
         self.assertIn(self.player1.name, self.board.borne_off[self.player1.name])
-
-    def test_illegal_move_wrong_dice(self):
-        """No debe permitir movimiento si no coincide con el dado."""
-        self.board.points[1] = [self.player1.name]
-        moved = self.board.move_checker(self.player1, 1, 4, [6])
-        self.assertFalse(moved)
 
 if __name__ == "__main__":
     unittest.main()

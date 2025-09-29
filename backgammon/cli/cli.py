@@ -22,13 +22,16 @@ class CLI:
         self.game.start_game()
 
         while True:
+            if self.game.is_finished():
+                print(f"🏆 ¡{self.game.current_player.name} ha ganado!")
+                break
             self.show_menu()
 
     def show_menu(self):
         print("\n===== Menú =====")
         print("1. Tirar dados")
         print("2. Mover ficha")
-        print("3. Mostrar tablero")
+        print("3. Mostrar estado del juego")
         print("4. Salir")
 
         opcion = input("Selecciona una opción: ")
@@ -42,14 +45,13 @@ class CLI:
             print(f"Turno de {jugador.name}")
             from_point = int(input("Mover desde punto: "))
             to_point = int(input("Mover a punto: "))
-            moved = self.game.move(from_point, to_point)
-            if moved:
+            if self.game.move(from_point, to_point):
                 print("Movimiento realizado ✅")
             else:
                 print("Movimiento inválido ❌")
 
         elif opcion == "3":
-            self.print_board()
+            self.print_board_state()
 
         elif opcion == "4":
             print("👋 Gracias por jugar Backgammon!")
@@ -57,13 +59,13 @@ class CLI:
         else:
             print("Opción inválida, intenta nuevamente.")
 
-    def print_board(self):
+    def print_board_state(self):
+        """Imprime tablero + bar + borneado."""
+        print("\n=== Tablero ===")
         print(self.game.board)
-
         print("\n=== Bar ===")
-        for player, captured in self.game.board.get_bar().items():
-            print(f"{player}: {captured}")
-
-        print("\n=== Borne Off ===")
-        for player, borne in self.game.board.get_borne_off().items():
-            print(f"{player}: {borne}")
+        for player, checkers in self.game.board.bar.items():
+            print(f"{player}: {len(checkers)} fichas -> {checkers}")
+        print("\n=== Borneado ===")
+        for player, checkers in self.game.board.borne_off.items():
+            print(f"{player}: {len(checkers)} fichas borneadas")
