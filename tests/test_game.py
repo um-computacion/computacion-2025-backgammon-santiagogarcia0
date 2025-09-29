@@ -21,5 +21,9 @@ class TestGame(unittest.TestCase):
         self.assertEqual(len(roll), 2)
         self.assertTrue(all(1 <= value <= 6 for value in roll))
 
+    def test_game_finished(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+        self.assertTrue(self.game.is_finished())
+
 if __name__ == "__main__":
     unittest.main()
