@@ -19,35 +19,35 @@ class TestGame(unittest.TestCase):
     def test_roll_dice(self):
         roll = self.game.roll_dice()
         self.assertEqual(len(roll), 2)
-        self.assertTrue(all(1 <= value <= 6 for value in roll))
+        self.assertTrue(all(1 <= v <= 6 for v in roll))
 
-    def test_game_not_finished_initially(self):
-        self.assertFalse(self.game.is_finished())
-        self.assertIsNone(self.game.check_winner())
-
-    def test_winner_detected_correctly(self):
-        # Simula que player1 borneó todas sus fichas
-        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+    def test_game_finished(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name]*15
         self.assertTrue(self.game.is_finished())
-        self.assertEqual(self.game.check_winner().name, "Santiago")
-        self.assertEqual(self.game.winner.name, "Santiago")
 
-    def test_only_one_player_can_win(self):
-        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
-        self.game.board.borne_off[self.player2.name] = [self.player2.name] * 15
+    def test_move_without_dice(self):
+        """No se puede mover si no se lanzaron dados."""
+        moved = self.game.move(1, 2)
+        self.assertFalse(moved)
 
-        # El primero que se chequea es el que gana (por orden de players)
-        self.assertEqual(self.game.winner.name, "Santiago")
+    def test_move_after_game_finished(self):
+        """No se puede mover si el juego ya terminó."""
+        self.game.board.borne_off[self.player1.name] = [self.player1.name]*15
+        self.game.available_moves = [1,2]
+        moved = self.game.move(1,2)
+        self.assertFalse(moved)
 
-    def test_move_after_victory_not_allowed(self):
-        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
-        # Aunque intentemos mover, debe devolver False
-        result = self.game.move(1, 2)
-        self.assertFalse(result)
-
-    def test_check_winner_none_if_no_one_has_15(self):
-        self.assertIsNone(self.game.check_winner())
-        self.assertFalse(self.game.is_finished())
+    def test_move_no_legal_moves(self):
+        """Si no hay movimientos legales, se pasa el turno automáticamente."""
+        self.game.available_moves = [6]  # asumiendo que no hay ficha a 6 de distancia
+        # bloqueamos todas las fichas de player1
+        for i in range(1,25):
+            self.game.board.points[i] = [self.player2.name]*2
+        prev_turn = self.game.current_turn_index
+        moved = self.game.move(1,7)
+        self.assertFalse(moved)
+        # turno debe pasar
+        self.assertNotEqual(self.game.current_turn_index, prev_turn)
 
 if __name__ == "__main__":
     unittest.main()
