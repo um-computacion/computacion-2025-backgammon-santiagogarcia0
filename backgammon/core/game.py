@@ -30,11 +30,9 @@ class Game:
     def roll_dice(self):
         """Lanza los dados y configura movimientos disponibles."""
         d1, d2 = self.dice.roll()
-        # dobles -> cuatro movimientos iguales
         if d1 == d2:
             self.available_moves = [d1] * 4
         else:
-            # guardamos valores tal cual (usar cada uno una vez)
             self.available_moves = [d1, d2]
         return (d1, d2)
 
@@ -42,25 +40,23 @@ class Game:
         """
         Intenta mover ficha:
          - Si el jugador no tiene movimientos legales con los dados -> devuelve False sin consumir ni cambiar turno.
-         - Si se realiza un movimiento exitoso, consume el dado usado (Board.move_checker lo hace).
+         - Si se realiza un movimiento exitoso, consume el dado usado.
          - Si tras el movimiento no quedan available_moves -> cambia de turno automáticamente.
         """
         player = self.current_player
 
-        # Si no hay dados lanzados aún, no se puede mover
         if not self.available_moves:
             return False
 
-        # Si no existen movimientos legales con los dados, pasar turno y limpiar available_moves
         if not self.board.has_any_legal_move(player, list(self.available_moves)):
-            # pasar turno
             self.next_turn()
             return False
 
         moved = self.board.move_checker(player, from_point, to_point, self.available_moves)
-        # si movimiento válido y ya no quedan movimientos, pasar turno
+
         if moved and not self.available_moves:
             self.next_turn()
+
         return moved
 
     def next_turn(self):
