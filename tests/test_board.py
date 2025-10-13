@@ -38,15 +38,23 @@ class TestBoard(unittest.TestCase):
         moved = self.board.move_checker(self.player1, 1, 5, [4])
         self.assertTrue(moved)
 
+    def test_multiple_hits_in_sequence(self):
+        self.board.points[5] = [self.player2.name]
+        self.board.points[6] = [self.player2.name]
+        self.board.points[1] = [self.player1.name]
+        moved1 = self.board.move_checker(self.player1, 1, 5, [4])
+        moved2 = self.board.move_checker(self.player1, 5, 6, [1])
+        self.assertTrue(moved1)
+        self.assertTrue(moved2)
+        self.assertIn(self.player2.name, self.board.bar[self.player2.name])
+
     def test_bear_off(self):
-        """Debe permitir borneado si se alcanza la meta."""
         self.board.points[1] = [self.player1.name]
         moved = self.board.move_checker(self.player1, 1, 0, [1])
         self.assertTrue(moved)
         self.assertIn(self.player1.name, self.board.borne_off[self.player1.name])
 
     def test_invalid_bear_off_when_not_in_home(self):
-        """No debe permitir borneado si hay fichas fuera de la zona final."""
         self.board.points[10] = [self.player1.name]
         moved = self.board.move_checker(self.player1, 10, 0, [10])
         self.assertFalse(moved)
