@@ -29,7 +29,12 @@ class Game:
 
     def roll_dice(self):
         """Lanza los dados y configura movimientos disponibles."""
+        # No permitir tirar dados si el juego ya terminó
+        if self.is_finished():
+            return None
+
         d1, d2 = self.dice.roll()
+        # dobles -> cuatro movimientos iguales
         if d1 == d2:
             self.available_moves = [d1] * 4
         else:
@@ -39,21 +44,30 @@ class Game:
     def move(self, from_point, to_point):
         """
         Intenta mover ficha:
-         - Si el jugador no tiene movimientos legales con los dados -> devuelve False sin consumir ni cambiar turno.
-         - Si se realiza un movimiento exitoso, consume el dado usado.
-         - Si tras el movimiento no quedan available_moves -> cambia de turno automáticamente.
+         - Si el juego ya terminó → False
+         - Si no hay dados lanzados → False
+         - Si no hay movimientos legales → pasar turno y False
+         - Si el movimiento es válido → actualiza dados (Board lo hace)
+         - Si no quedan dados → cambiar turno
         """
         player = self.current_player
 
+        # El juego ya tiene ganador → no se puede mover
+        if self.is_finished():
+            return False
+
+        # Si no hay dados lanzados aún, no se puede mover
         if not self.available_moves:
             return False
 
+        # Si el jugador no tiene movimientos legales
         if not self.board.has_any_legal_move(player, list(self.available_moves)):
             self.next_turn()
             return False
 
         moved = self.board.move_checker(player, from_point, to_point, self.available_moves)
 
+        # Si movimiento válido y ya no quedan movimientos, pasar turno
         if moved and not self.available_moves:
             self.next_turn()
 
@@ -69,13 +83,18 @@ class Game:
         """Devuelve el jugador en turno."""
         return self.players[self.current_turn_index]
 
-    def check_winner(self):
+    @property
+    def winner(self):
         """Devuelve el jugador ganador si ya borneó todas sus fichas, sino None."""
         for player in self.players:
             if len(self.board.borne_off.get(player.name, [])) >= 15:
                 return player
         return None
 
+    def check_winner(self):
+        """Alias por compatibilidad."""
+        return self.winner
+
     def is_finished(self):
-        """Determina si el juego terminó (victoria)."""
-        return self.check_winner() is not None
+        """Determina si el juego terminó."""
+        return self.winner is not None

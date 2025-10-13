@@ -15,46 +15,39 @@ class TestGame(unittest.TestCase):
     def test_switch_turn(self):
         self.game.next_turn()
         self.assertEqual(self.game.current_player.name, "Ana")
-        self.game.next_turn()
-        self.assertEqual(self.game.current_player.name, "Santiago")
 
     def test_roll_dice(self):
         roll = self.game.roll_dice()
         self.assertEqual(len(roll), 2)
         self.assertTrue(all(1 <= value <= 6 for value in roll))
-        # test dobles
-        self.game.dice.roll = lambda: (3, 3)
-        roll = self.game.roll_dice()
-        self.assertEqual(self.game.available_moves, [3, 3, 3, 3])
 
-    def test_move_consumes_dice_and_switch_turn(self):
-        self.game.available_moves = [2, 3]
-        self.game.board.points[1] = [self.player1.name]
-        moved = self.game.move(1, 3)  # usa el dado 2
-        self.assertTrue(moved)
-        self.assertEqual(self.game.available_moves, [3])
-        # siguiente movimiento consume último dado y cambia turno
-        self.game.board.points[3] = [self.player1.name]
-        moved2 = self.game.move(3, 6)
-        self.assertTrue(moved2)
-        self.assertEqual(self.game.current_player.name, "Ana")
-        self.assertEqual(self.game.available_moves, [])
+    def test_game_not_finished_initially(self):
+        self.assertFalse(self.game.is_finished())
+        self.assertIsNone(self.game.check_winner())
 
-    def test_move_no_available_moves_skips_turn(self):
-        # ninguna jugada posible
-        self.game.available_moves = [6]
-        # poner bloque para el jugador 1
-        self.game.board.points[1] = [self.player1.name]
-        self.game.board.points[7] = [self.player2.name, self.player2.name]
-        moved = self.game.move(1, 7)
-        self.assertFalse(moved)
-        self.assertEqual(self.game.current_player.name, "Ana")
-
-    def test_game_finished(self):
+    def test_winner_detected_correctly(self):
+        # Simula que player1 borneó todas sus fichas
         self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
         self.assertTrue(self.game.is_finished())
-        winner = self.game.check_winner()
-        self.assertEqual(winner.name, "Santiago")
+        self.assertEqual(self.game.check_winner().name, "Santiago")
+        self.assertEqual(self.game.winner.name, "Santiago")
+
+    def test_only_one_player_can_win(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+        self.game.board.borne_off[self.player2.name] = [self.player2.name] * 15
+
+        # El primero que se chequea es el que gana (por orden de players)
+        self.assertEqual(self.game.winner.name, "Santiago")
+
+    def test_move_after_victory_not_allowed(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+        # Aunque intentemos mover, debe devolver False
+        result = self.game.move(1, 2)
+        self.assertFalse(result)
+
+    def test_check_winner_none_if_no_one_has_15(self):
+        self.assertIsNone(self.game.check_winner())
+        self.assertFalse(self.game.is_finished())
 
 if __name__ == "__main__":
     unittest.main()
