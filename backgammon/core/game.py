@@ -29,24 +29,27 @@ class Game:
 
     def roll_dice(self):
         """Lanza los dados y configura movimientos disponibles."""
+        if self.is_finished():
+            return None
         d1, d2 = self.dice.roll()
-        if d1 == d2:
-            self.available_moves = [d1] * 4
-        else:
-            self.available_moves = [d1, d2]
+        self.available_moves = [d1]*4 if d1 == d2 else [d1, d2]
         return (d1, d2)
 
     def move(self, from_point, to_point):
         """
         Intenta mover ficha:
-         - Si el jugador no tiene movimientos legales con los dados -> devuelve False sin consumir ni cambiar turno.
-         - Si se realiza un movimiento exitoso, consume el dado usado.
-         - Si tras el movimiento no quedan available_moves -> cambia de turno automáticamente.
+        - Si el juego terminó → False
+        - Si no hay dados lanzados → False
+        - Si no hay movimientos legales → pasar turno y False
+        - Si movimiento válido → actualiza dados
+        - Si no quedan dados → cambia turno
         """
-        player = self.current_player
-
+        if self.is_finished():
+            return False
         if not self.available_moves:
             return False
+
+        player = self.current_player
 
         if not self.board.has_any_legal_move(player, list(self.available_moves)):
             self.next_turn()
@@ -69,13 +72,18 @@ class Game:
         """Devuelve el jugador en turno."""
         return self.players[self.current_turn_index]
 
-    def check_winner(self):
+    @property
+    def winner(self):
         """Devuelve el jugador ganador si ya borneó todas sus fichas, sino None."""
         for player in self.players:
             if len(self.board.borne_off.get(player.name, [])) >= 15:
                 return player
         return None
 
+    def check_winner(self):
+        """Alias por compatibilidad."""
+        return self.winner
+
     def is_finished(self):
-        """Determina si el juego terminó (victoria)."""
-        return self.check_winner() is not None
+        """Determina si el juego terminó."""
+        return self.winner is not None

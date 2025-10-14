@@ -14,13 +14,19 @@ class Dice:
         self.last_roll = (0, 0)
 
     def roll(self):
-        """Lanza los dos dados y guarda sus valores."""
-        self.last_roll = (random.randint(1, 6), random.randint(1, 6))
+        """Lanza los dos dados (1-6) y guarda sus valores."""
+        d1 = random.randint(1, 6)
+        d2 = random.randint(1, 6)
+        self.last_roll = (d1, d2)
         return self.last_roll
 
     def roll_double(self):
-        """Lanza dos dados iguales para movimientos especiales."""
-        self.last_roll = (random.randint(1, 6), random.randint(1, 6))
+        """
+        Fuerza un doble para pruebas o reglas especiales.
+        Siempre devuelve (x, x) y lo guarda en last_roll.
+        """
+        value = random.randint(1, 6)
+        self.last_roll = (value, value)
         return self.last_roll
 
     def get_values(self):
