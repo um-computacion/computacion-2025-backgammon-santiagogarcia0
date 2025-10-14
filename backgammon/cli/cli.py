@@ -38,13 +38,21 @@ class CLI:
 
         if opcion == "1":
             roll = self.game.roll_dice()
-            print(f"Dados: {roll}")
+            if roll:
+                print(f"Dados: {roll}")
+            else:
+                print("El juego ya terminó.")
 
         elif opcion == "2":
             jugador = self.game.current_player
             print(f"Turno de {jugador.name}")
-            from_point = int(input("Mover desde punto: "))
-            to_point = int(input("Mover a punto: "))
+            try:
+                from_point = int(input("Mover desde punto: "))
+                to_point = int(input("Mover a punto: "))
+            except ValueError:
+                print("Entrada inválida, ingresa números.")
+                return
+
             if self.game.move(from_point, to_point):
                 print("Movimiento realizado ✅")
             else:
@@ -56,6 +64,7 @@ class CLI:
         elif opcion == "4":
             print("👋 Gracias por jugar Backgammon!")
             exit()
+
         else:
             print("Opción inválida, intenta nuevamente.")
 

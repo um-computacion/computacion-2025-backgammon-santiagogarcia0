@@ -1,30 +1,54 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from backgammon.cli.cli import CLI
-from backgammon.core.player import Player
-from backgammon.core.game import Game
+
 
 class TestCLI(unittest.TestCase):
     def setUp(self):
-        self.cli = CLI()
-        player1 = Player("Jugador1")
-        player2 = Player("Jugador2")
-        self.cli.game = Game(player1, player2)
-        self.cli.game.start_game()
+        # Creamos un mock de Game
+        self.mock_game = MagicMock()
+        self.mock_game.board = "TABLERO_MOCK"
 
-    @patch("builtins.input", side_effect=["1"])
-    def test_tirar_dados(self, mock_input):
-        # Llamamos a show_menu y verificamos que no crashea
-        self.cli.show_menu()
+        # Instanciamos la CLI con el mock de game
+        self.cli = CLI(self.mock_game)
 
-    @patch("builtins.input", side_effect=["3"])
-    def test_mostrar_tablero(self, mock_input):
-        self.cli.show_menu()
+    @patch("builtins.print")
+    def test_show_message(self, mock_print):
+        self.cli.show_message("Hola")
+        mock_print.assert_called_once_with("Hola")
 
-    @patch("builtins.input", side_effect=["4"])
-    def test_salir(self, mock_input):
-        with self.assertRaises(SystemExit):
-            self.cli.show_menu()
+    @patch("builtins.print")
+    def test_show_board(self, mock_print):
+        self.cli.show_board()
+        mock_print.assert_any_call("TABLERO_MOCK")
+
+    @patch("builtins.print")
+    def test_show_dice(self, mock_print):
+        self.cli.show_dice([3, 5])
+        mock_print.assert_called_once_with("Dados: [3, 5]")
+
+    @patch("builtins.input", return_value="6 3")
+    def test_ask_move(self, mock_input):
+        movimiento = self.cli.ask_move()
+        self.assertEqual(movimiento, "6 3")
+        mock_input.assert_called_once_with("Ingresa tu movimiento (ej: '6 3'): ")
+
+    @patch("builtins.print")
+    def test_show_winner(self, mock_print):
+        mock_player = MagicMock()
+        mock_player.name = "Jugador1"
+        self.cli.show_winner(mock_player)
+        mock_print.assert_called_once_with("¡Jugador1 ha ganado el juego!")
+
+    @patch("builtins.print")
+    def test_start(self, mock_print):
+        """
+        start() debe mostrar el mensaje de bienvenida y el tablero.
+        """
+        self.cli.start()
+        mock_print.assert_any_call("Bienvenido a Backgammon!")
+        mock_print.assert_any_call("TABLERO_MOCK")
+
 
 if __name__ == "__main__":
     unittest.main()
