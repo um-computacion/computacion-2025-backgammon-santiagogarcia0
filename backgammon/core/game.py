@@ -28,21 +28,23 @@ class Game:
         self.board.setup_board(self.players)
 
     def roll_dice(self):
-        """Lanza los dados y configura movimientos disponibles."""
+        """Lanza los dados y configura movimientos disponibles (no si ya terminó)."""
         if self.is_finished():
             return None
         d1, d2 = self.dice.roll()
-        self.available_moves = [d1]*4 if d1 == d2 else [d1, d2]
+        if d1 == d2:
+            self.available_moves = [d1] * 4
+        else:
+            self.available_moves = [d1, d2]
         return (d1, d2)
 
     def move(self, from_point, to_point):
         """
         Intenta mover ficha:
-        - Si el juego terminó → False
-        - Si no hay dados lanzados → False
-        - Si no hay movimientos legales → pasar turno y False
-        - Si movimiento válido → actualiza dados
-        - Si no quedan dados → cambia turno
+         - Si el juego terminó → False
+         - Si no hay dados lanzados → False
+         - Si no hay movimientos legales → pasar turno y False
+         - Si movimiento válido → se consume dado; si ya no quedan → next_turn()
         """
         if self.is_finished():
             return False
@@ -51,6 +53,7 @@ class Game:
 
         player = self.current_player
 
+        # si no hay movimientos legales, pasar turno
         if not self.board.has_any_legal_move(player, list(self.available_moves)):
             self.next_turn()
             return False

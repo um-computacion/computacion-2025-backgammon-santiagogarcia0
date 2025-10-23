@@ -27,24 +27,24 @@ class TestGame(unittest.TestCase):
 
     def test_move_without_dice(self):
         """No se puede mover si no se lanzaron dados."""
-        moved = self.game.move(1, 2)
+        moved = self.game.move(24, 23)
         self.assertFalse(moved)
 
     def test_move_after_game_finished(self):
         """No se puede mover si el juego ya terminó."""
         self.game.board.borne_off[self.player1.name] = [self.player1.name]*15
         self.game.available_moves = [1,2]
-        moved = self.game.move(1,2)
+        moved = self.game.move(24,23)
         self.assertFalse(moved)
 
     def test_move_no_legal_moves(self):
         """Si no hay movimientos legales, se pasa el turno automáticamente."""
-        self.game.available_moves = [6]  # asumiendo que no hay ficha a 6 de distancia
-        # bloqueamos todas las fichas de player1
+        self.game.available_moves = [6]
+        # bloqueamos todas las fichas de player1 con stacks de 2 enemigas
         for i in range(1,25):
             self.game.board.points[i] = [self.player2.name]*2
         prev_turn = self.game.current_turn_index
-        moved = self.game.move(1,7)
+        moved = self.game.move(24, 18)
         self.assertFalse(moved)
         # turno debe pasar
         self.assertNotEqual(self.game.current_turn_index, prev_turn)

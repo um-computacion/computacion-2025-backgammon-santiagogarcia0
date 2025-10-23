@@ -23,7 +23,8 @@ class CLI:
 
         while True:
             if self.game.is_finished():
-                print(f"🏆 ¡{self.game.current_player.name} ha ganado!")
+                winner = self.game.current_player.name
+                print(f"🏆 ¡{winner} ha ganado!")
                 break
             self.show_menu()
 
