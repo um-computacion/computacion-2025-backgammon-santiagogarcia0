@@ -1,6 +1,6 @@
 import pygame
 import sys
-from pygame_ui.gui_board import BoardRenderer  # 👈 nuevo import
+from pygame_ui.gui_board import BoardRenderer  # 👈 Import del tablero gráfico
 
 # ============================
 # Configuración inicial
@@ -20,12 +20,17 @@ class PygameBackgammon:
         pygame.init()
         pygame.display.set_caption("Backgammon - Pygame UI")
 
+        # Configuración de pantalla
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
         self.running = True
 
-        # Renderer del tablero
+        # Inicializar el renderer del tablero
         self.board_renderer = BoardRenderer(self.screen)
+
+    # ---------------------------
+    # Gestión de eventos
+    # ---------------------------
 
     def handle_events(self):
         """Procesa eventos del usuario (clics, cerrar ventana, etc.)."""
@@ -35,14 +40,26 @@ class PygameBackgammon:
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.running = False
 
+    # ---------------------------
+    # Renderizado del tablero
+    # ---------------------------
+
     def draw_board(self):
         """Usa BoardRenderer para dibujar el tablero completo."""
+        # Fondo general
+        self.screen.fill(BACKGROUND_COLOR)
+
+        # Dibujar tablero con fichas
         self.board_renderer.draw_board()
 
-        # Texto de encabezado
-        font = pygame.font.SysFont("Arial", 32)
+        # Título del juego
+        font = pygame.font.SysFont("Arial", 32, bold=True)
         text = font.render("Backgammon (Vista Gráfica - Pygame)", True, (255, 255, 255))
-        self.screen.blit(text, (WINDOW_WIDTH // 2 - text.get_width() // 2, 10))
+        self.screen.blit(text, (WINDOW_WIDTH // 2 - text.get_width() // 2, 15))
+
+    # ---------------------------
+    # Bucle principal
+    # ---------------------------
 
     def run(self):
         """Bucle principal de la aplicación."""
