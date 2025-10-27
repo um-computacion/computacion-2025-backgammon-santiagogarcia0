@@ -39,8 +39,16 @@ class Board:
         # limpiar y colocar todos en puntos de prueba (simplificado)
         self.points = {i: [] for i in range(1, 25)}
         # estándar: player0 en 24, player1 en 1
-        self.points[24] = [players[0].name] * 15
-        self.points[1] = [players[1].name] * 15
+        self.points[24] = [players[0]] * 2
+        self.points[13] = [players[0]] * 5
+        self.points[8] = [players[0]] * 3
+        self.points[6] = [players[0]] * 5
+
+        self.points[1] = [players[1]] * 2
+        self.points[12] = [players[1]] * 5
+        self.points[17] = [players[1]] * 3
+        self.points[19] = [players[1]] * 5
+
 
         # Inicializar estructuras
         self.bar = {p.name: [] for p in players}
@@ -59,11 +67,11 @@ class Board:
 
     def _remove_checker(self, player, from_point):
         """Quita una ficha de un punto."""
-        self.points[from_point].remove(player.name)
+        self.points[from_point].remove(player)
 
     def _add_checker(self, player, to_point):
         """Agrega una ficha a un punto."""
-        self.points[to_point].append(player.name)
+        self.points[to_point].append(player)
 
     def _entry_point_from_bar(self, player, dice_value):
         """
@@ -93,7 +101,7 @@ class Board:
         """Retorna True si todas las fichas del jugador (no borneadas) están en su home."""
         name = player.name
         for pt, stack in self.points.items():
-            if any(c == name for c in stack):
+            if any(c == player for c in stack):
                 if not self._in_home_board(player, pt):
                     return False
         return True
@@ -120,12 +128,12 @@ class Board:
         if from_point != "bar":
             if not self._valid_point(from_point) or from_point == 0 or from_point == 25:
                 return False
-            if not self.points[from_point] or self.points[from_point][0] != name:
+            if not self.points[from_point] or self.points[from_point][0] != player:
                 return False
 
             # bloqueo por 2+ fichas enemigas
             if to_point not in (0, 25) and self.points[to_point]:
-                if self.points[to_point][0] != name and len(self.points[to_point]) >= 2:
+                if self.points[to_point][0] != player and len(self.points[to_point]) >= 2:
                     return False
 
             # validar distancia con dados
@@ -148,7 +156,7 @@ class Board:
             for d in list(dice_rolls):
                 entry = self._entry_point_from_bar(player, d)
                 if self.points[entry]:
-                    if self.points[entry][0] != name and len(self.points[entry]) >= 2:
+                    if self.points[entry][0] != player and len(self.points[entry]) >= 2:
                         continue
                 return True
             return False
@@ -174,15 +182,15 @@ class Board:
         if from_point == "bar":
             for d in list(dice_rolls):
                 entry = self._entry_point_from_bar(player, d)
-                if self.points[entry] and self.points[entry][0] != name and len(self.points[entry]) >= 2:
+                if self.points[entry] and self.points[entry][0] != player and len(self.points[entry]) >= 2:
                     continue
                 if self._consume_dice_for_entry(player, dice_rolls, d):
                     if self.bar[name]:
                         self.bar[name].pop()
                     # golpe
-                    if self.points[entry] and self.points[entry][0] != name and len(self.points[entry]) == 1:
+                    if self.points[entry] and self.points[entry][0] != player and len(self.points[entry]) == 1:
                         opponent = self.points[entry].pop()
-                        self.bar[opponent].append(opponent)
+                        self.bar[opponent.name].append(opponent)
                     self._add_checker(player, entry)
                     return True
             return False
@@ -200,21 +208,21 @@ class Board:
         # borne off
         if to_point in (0, 25):
             self._remove_checker(player, from_point)
-            self.borne_off[name].append(name)
+            self.borne_off[name].append(player)
             return True
 
         destination = self.points[to_point]
 
         # golpe (1 ficha enemiga)
-        if destination and destination[0] != name and len(destination) == 1:
+        if destination and destination[0] != player and len(destination) == 1:
             opponent = destination.pop()
-            self.bar[opponent].append(opponent)
+            self.bar[opponent.name].append(opponent)
             self._remove_checker(player, from_point)
             self._add_checker(player, to_point)
             return True
 
         # más de una ficha enemiga → mover sin golpear
-        if destination and destination[0] != name and len(destination) > 1:
+        if destination and destination[0] != player and len(destination) > 1:
             self._remove_checker(player, from_point)
             self._add_checker(player, to_point)
             return True
@@ -230,12 +238,12 @@ class Board:
         if self.bar.get(name):
             for d in set(dice_rolls):
                 entry = self._entry_point_from_bar(player, d)
-                if not (self.points[entry] and self.points[entry][0] != name and len(self.points[entry]) >= 2):
+                if not (self.points[entry] and self.points[entry][0] != player and len(self.points[entry]) >= 2):
                     return True
             return False
 
         for from_pt, stack in self.points.items():
-            if not stack or stack[0] != name:
+            if not stack or stack[0] != player:
                 continue
             for d in set(dice_rolls):
                 direction = getattr(player, "direction", +1)
@@ -245,7 +253,7 @@ class Board:
                         continue
                     return True
                 if 1 <= to_pt <= 24:
-                    if self.points[to_pt] and self.points[to_pt][0] != name and len(self.points[to_pt]) >= 2:
+                    if self.points[to_pt] and self.points[to_pt][0] != player and len(self.points[to_pt]) >= 2:
                         continue
                     return True
         return False
