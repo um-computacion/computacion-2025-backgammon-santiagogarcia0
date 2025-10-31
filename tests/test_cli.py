@@ -1,58 +1,28 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 from backgammon.cli.cli import CLI
-from backgammon.core.player import Player
-from backgammon.core.game import Game
 
 class TestCLI(unittest.TestCase):
+
     def setUp(self):
-        # Creamos CLI con juego inicializado
         self.cli = CLI()
-        player1 = Player("Jugador1")
-        player2 = Player("Jugador2")
-        self.cli.game = Game(player1, player2)
-        self.cli.game.start_game()
 
-    @patch("builtins.input", side_effect=["1"])
-    def test_tirar_dados(self, mock_input):
-        """Verifica que tirar dados no crashee y actualice available_moves."""
-        self.cli.show_menu()
-        self.assertTrue(len(self.cli.game.available_moves) in (2,4))
+    @patch('builtins.input', side_effect=[''])
+    @patch('builtins.print')
+    def test_start_game_flow_runs(self, mock_print, mock_input):
+        # Simular que el juego termina y hay un ganador
+        with patch.object(self.cli.game, 'is_finished', return_value=True):
+            with patch('backgammon.core.game.Game.winner', new_callable=PropertyMock) as mock_winner:
+                mock_winner.return_value = self.cli.game.players[0]
+                self.cli.start()
+        
+        # Verificar que se anuncia al ganador
+        mock_print.assert_any_call(f"\n¡Felicidades, {self.cli.game.players[0].name}! Has ganado. 🏆")
 
-    @patch("builtins.input", side_effect=["3"])
-    def test_mostrar_tablero(self, mock_input):
-        """Mostrar tablero no debe crashear."""
-        self.cli.show_menu()
+    @patch('builtins.print')
+    def test_print_board_state(self, mock_print):
+        self.cli.print_board_state()
+        mock_print.assert_any_call("="*40)
 
-    @patch("builtins.input", side_effect=["4"])
-    def test_salir(self, mock_input):
-        with self.assertRaises(SystemExit):
-            self.cli.show_menu()
-
-    @patch("builtins.input", side_effect=["2", "24", "23"])
-    def test_mover_ficha_valida(self, mock_input):
-        """Mueve una ficha válida (preparada) y consume el dado."""
-        # preparamos una ficha del jugador actual en 24 (player0)
-        self.cli.game.board.points[24] = [self.cli.game.current_player.name]
-        self.cli.game.available_moves = [1]
-        self.cli.show_menu()
-        self.assertEqual(self.cli.game.available_moves, [])
-
-    @patch("builtins.input", side_effect=["2", "24", "22"])
-    def test_mover_ficha_invalida(self, mock_input):
-        """Movimiento inválido no debe consumir dado."""
-        self.cli.game.board.points[24] = [self.cli.game.current_player.name]
-        self.cli.game.available_moves = [1]
-        self.cli.show_menu()
-        self.assertEqual(self.cli.game.available_moves, [1])
-
-    @patch("builtins.input", side_effect=["1"])
-    def test_tirar_dados_juego_terminado(self, mock_input):
-        """Si juego terminado, tirar dados no hace nada."""
-        winner_name = self.cli.game.current_player.name
-        self.cli.game.board.borne_off[winner_name] = [winner_name]*15
-        self.cli.show_menu()
-        self.assertEqual(self.cli.game.available_moves, [])
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

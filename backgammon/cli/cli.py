@@ -1,81 +1,76 @@
 """
 Módulo CLI
-Provee una interfaz de línea de comandos básica para jugar Backgammon.
+Provee una interfaz de línea de comandos para jugar Backgammon.
 """
 
-from backgammon.core.player import Player
 from backgammon.core.game import Game
 
 class CLI:
     def __init__(self):
-        self.game = None
+        self.game = Game()
 
     def start(self):
-        print("🎲 Bienvenido a Backgammon (versión simplificada) 🎲")
-        name1 = input("Nombre del Jugador 1: ")
-        name2 = input("Nombre del Jugador 2: ")
-
-        player1 = Player(name1)
-        player2 = Player(name2)
-
-        self.game = Game(player1, player2)
+        print("🎲 ¡Bienvenido a Backgammon por Consola! 🎲")
         self.game.start_game()
-
-        while True:
-            if self.game.is_finished():
-                winner = self.game.current_player.name
-                print(f"🏆 ¡{winner} ha ganado!")
-                break
-            self.show_menu()
-
-    def show_menu(self):
-        print("\n===== Menú =====")
-        print("1. Tirar dados")
-        print("2. Mover ficha")
-        print("3. Mostrar estado del juego")
-        print("4. Salir")
-
-        opcion = input("Selecciona una opción: ")
-
-        if opcion == "1":
-            roll = self.game.roll_dice()
-            if roll:
-                print(f"Dados: {roll}")
-            else:
-                print("El juego ya terminó.")
-
-        elif opcion == "2":
-            jugador = self.game.current_player
-            print(f"Turno de {jugador.name}")
-            try:
-                from_point = int(input("Mover desde punto: "))
-                to_point = int(input("Mover a punto: "))
-            except ValueError:
-                print("Entrada inválida, ingresa números.")
-                return
-
-            if self.game.move(from_point, to_point):
-                print("Movimiento realizado ✅")
-            else:
-                print("Movimiento inválido ❌")
-
-        elif opcion == "3":
+        
+        while not self.game.is_finished():
             self.print_board_state()
+            player = self.game.current_player
+            print(f"\n--- Turno de {player.name} ---")
 
-        elif opcion == "4":
-            print("👋 Gracias por jugar Backgammon!")
-            exit()
+            # Tirar dados
+            input("Presiona Enter para tirar los dados...")
+            dice = self.game.roll_dice()
+            print(f"Has sacado: {dice}")
 
-        else:
-            print("Opción inválida, intenta nuevamente.")
+            if not self.game.available_moves:
+                print("No tienes movimientos posibles. Pasando turno.")
+                continue
+
+            # Realizar movimientos
+            while self.game.available_moves:
+                self.print_board_state()
+                print(f"Dados disponibles: {self.game.available_moves}")
+                
+                try:
+                    from_point_str = input("Mover desde (o 'bar'): ")
+                    from_point = "bar" if from_point_str == "bar" else int(from_point_str)
+                    
+                    to_point = int(input("Mover hasta: "))
+
+                    if self.game.move(from_point, to_point):
+                        print("Movimiento realizado con éxito. ✅")
+                    else:
+                        print("Movimiento inválido. Inténtalo de nuevo. ❌")
+                except ValueError:
+                    print("Entrada inválida. Introduce números para los puntos.")
+        
+        print(f"\n¡Felicidades, {self.game.winner.name}! Has ganado. 🏆")
 
     def print_board_state(self):
-        """Imprime tablero + bar + borneado."""
-        print("\n=== Tablero ===")
-        print(self.game.board)
-        print("\n=== Bar ===")
-        for player, checkers in self.game.board.bar.items():
-            print(f"{player}: {len(checkers)} fichas -> {checkers}")
-        print("\n=== Borneado ===")
-        for player, checkers in self.game.board.borne_off.items():
-            print(f"{player}: {len(checkers)} fichas borneadas")
+        """Imprime el estado completo del tablero."""
+        board = self.game.board
+        print("\n" + "="*40)
+        
+        # Puntos
+        for i in range(13, 25):
+            print(f"{i:2}: {board.points[i]}")
+        print("-" * 40)
+        for i in range(12, 0, -1):
+            print(f"{i:2}: {board.points[i]}")
+
+        # Barra
+        print("\nBarra:")
+        for name, checkers in board.bar.items():
+            if checkers:
+                print(f"  {name}: {len(checkers)} fichas")
+
+        # Fichas fuera
+        print("\nFichas fuera:")
+        for name, checkers in board.borne_off.items():
+            print(f"  {name}: {len(checkers)} fichas")
+        
+        print("="*40)
+
+if __name__ == "__main__":
+    CLI().start()
