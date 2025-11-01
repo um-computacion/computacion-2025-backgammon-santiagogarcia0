@@ -103,7 +103,25 @@ class BoardRenderer:
     def draw_legal_moves(self, moves):
         """Resalta los movimientos legales."""
         for point in moves:
-            x, y = self._get_checker_pos(point, 0) # Posición base
-            s = pygame.Surface((self.checker_radius * 2, self.checker_radius * 2), pygame.SRCALPHA)
-            s.fill(HIGHLIGHT_COLOR)
-            self.surface.blit(s, (x - self.checker_radius, y - self.checker_radius))
+            if point in [0, 25]: # Bear off
+                rect = self.get_bear_off_rect(point)
+                s = pygame.Surface(rect.size, pygame.SRCALPHA)
+                s.fill(HIGHLIGHT_COLOR)
+                self.surface.blit(s, rect.topleft)
+            else:
+                x, y = self._get_checker_pos(point, 0) # Posición base
+                s = pygame.Surface((self.checker_radius * 2, self.checker_radius * 2), pygame.SRCALPHA)
+                s.fill(HIGHLIGHT_COLOR)
+                self.surface.blit(s, (x - self.checker_radius, y - self.checker_radius))
+
+    def get_point_rect(self, point):
+        """Devuelve un rect para un punto del tablero."""
+        x, y = self._get_checker_pos(point, 0)
+        return pygame.Rect(x - self.checker_radius, y - self.checker_radius, self.checker_radius * 2, self.checker_radius * 2)
+
+    def get_bear_off_rect(self, point):
+        """Devuelve un rect para la zona de bear off."""
+        if point == 0: # Player 1 (Negro)
+            return pygame.Rect(self.width - self.inner_margin, self.height / 2, self.inner_margin, self.height / 2 - self.inner_margin)
+        else: # Player 2 (Blanco)
+            return pygame.Rect(self.width - self.inner_margin, self.inner_margin, self.inner_margin, self.height / 2 - self.inner_margin)

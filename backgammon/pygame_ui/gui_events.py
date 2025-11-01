@@ -14,6 +14,14 @@ class CheckerManager:
         mx, my = pos
         br = self.board_renderer
 
+        # Comprobar si el clic fue en la zona de bear off
+        bear_off_rect_p1 = br.get_bear_off_rect(0)
+        bear_off_rect_p2 = br.get_bear_off_rect(25)
+        if bear_off_rect_p1.collidepoint(mx, my):
+            return 0
+        if bear_off_rect_p2.collidepoint(mx, my):
+            return 25
+
         # Determinar si el clic fue en la fila superior o inferior
         if br.inner_margin < my < br.inner_margin + br.triangle_height:
             row = 'top'

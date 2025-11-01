@@ -28,3 +28,20 @@ class Menu:
                 if rect.collidepoint(event.pos):
                     return key
         return None
+
+class EndScreen(Menu):
+    def __init__(self, surface, winner):
+        super().__init__(surface)
+        self.winner = winner
+    
+    def draw(self):
+        # Draw title
+        title_text = self.title_font.render(f"¡Gana {self.winner}!", True, (255, 255, 255))
+        self.surface.blit(title_text, (self.surface.get_width() // 2 - title_text.get_width() // 2, 150))
+
+        # Draw buttons
+        for key, rect in self.buttons.items():
+            pygame.draw.rect(self.surface, (0, 100, 0), rect)
+            pygame.draw.rect(self.surface, (255, 255, 255), rect, 2)
+            text = self.font.render(key.replace("_", " ").title(), True, (255, 255, 255))
+            self.surface.blit(text, (rect.x + (rect.width - text.get_width()) // 2, rect.y + (rect.height - text.get_height()) // 2))

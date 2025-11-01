@@ -57,34 +57,25 @@ class Game:
         if to_point not in legal_moves:
             return False
 
-        # --- Lógica para reingreso desde la barra ---
+        # --- Determinar el dado utilizado ---
+        roll_used = None
         if from_point == "bar":
             roll_used = to_point if player.direction == 1 else 25 - to_point
-            if roll_used not in self.available_moves:
-                return False # Seguridad adicional
-            
-            self.board.move_checker(player, from_point, to_point)
-            self.available_moves.remove(roll_used)
-        
-        # --- Lógica para movimientos normales y bear off ---
-        else:
-            distance = abs(to_point - from_point)
-            roll_used = None
-
+        elif to_point in (0, 25): # Bear off
+            distance = abs(from_point - to_point)
             if distance in self.available_moves:
                 roll_used = distance
-            else: # Lógica para bear off no exacto
-                possible_rolls = [r for r in self.available_moves if r > distance]
-                if possible_rolls:
-                    highest_point = self.board.get_highest_occupied_point(player)
-                    if from_point == highest_point:
-                         roll_used = min(possible_rolls)
-            
-            if roll_used is None:
-                return False
-            
-            self.board.move_checker(player, from_point, to_point)
-            self.available_moves.remove(roll_used)
+            else: # Bear off no exacto
+                roll_used = max(r for r in self.available_moves if r >= distance)
+        else: # Movimiento normal
+            roll_used = abs(to_point - from_point)
+
+        if roll_used is None or roll_used not in self.available_moves:
+            return False
+
+        # --- Ejecutar movimiento ---
+        self.board.move_checker(player, from_point, to_point)
+        self.available_moves.remove(roll_used)
 
         # Comprobar si el turno debe terminar
         if not self.available_moves or not self.board.has_any_legal_move(player, self.available_moves):

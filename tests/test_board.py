@@ -41,5 +41,41 @@ class TestBoard(unittest.TestCase):
         moves = self.board.get_legal_moves(self.player1, 1, [1])
         self.assertNotIn(0, moves)
 
+    def test_get_legal_moves_bear_off(self):
+        # Preparar tablero para bear off
+        self.board.points = {i: [] for i in range(1, 25)}
+        self.board.points[1] = [self.player1.name]
+        self.board.points[3] = [self.player1.name]
+        
+        # Test de bear off exacto
+        moves = self.board.get_legal_moves(self.player1, 1, [1])
+        self.assertIn(0, moves)
+
+        # Test de bear off con dado mayor
+        moves = self.board.get_legal_moves(self.player1, 3, [4])
+        self.assertIn(0, moves)
+
+        # Test de bear off inválido (dado menor)
+        moves = self.board.get_legal_moves(self.player1, 3, [2])
+        self.assertNotIn(0, moves)
+
+    def test_get_legal_moves_bear_off_white_player(self):
+        # Preparar tablero para bear off del jugador blanco
+        self.board.points = {i: [] for i in range(1, 25)}
+        self.board.points[22] = [self.player2.name]
+        self.board.points[24] = [self.player2.name]
+        
+        # Test de bear off exacto
+        moves = self.board.get_legal_moves(self.player2, 24, [1])
+        self.assertIn(25, moves)
+
+        # Test de bear off con dado mayor (y checker más lejano)
+        moves = self.board.get_legal_moves(self.player2, 24, [3])
+        self.assertIn(25, moves)
+
+        # Test de bear off inválido (no es el checker más lejano)
+        moves = self.board.get_legal_moves(self.player2, 22, [5])
+        self.assertNotIn(25, moves)
+
 if __name__ == '__main__':
     unittest.main()
