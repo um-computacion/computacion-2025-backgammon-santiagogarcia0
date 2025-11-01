@@ -64,18 +64,18 @@ class Board:
         """Calcula los movimientos legales desde un punto dado."""
         if from_point == "bar":
             legal_moves = []
-            for roll in set(dice_rolls):
+            for roll in dice_rolls:
                 entry_point = self._entry_point_from_bar(player, roll)
                 target = self.points[entry_point]
                 if len(target) <= 1 or target[0] == player.name:
                     legal_moves.append(entry_point)
-            return legal_moves
+            return list(set(legal_moves))
 
         legal_moves = []
         direction = player.direction
         can_bear_off = self._all_checkers_in_home(player) and not self.bar[player.name]
 
-        for roll in set(dice_rolls):
+        for roll in dice_rolls:
             to_point = from_point + roll * direction
             
             # Movimiento de salida (bear off)
@@ -87,10 +87,9 @@ class Board:
                 # Regla del número mayor
                 if (direction == 1 and to_point > 25) or (direction == -1 and to_point < 1):
                     is_highest_checker = True
-                    start = from_point + direction
-                    end = 25 if direction == 1 else 0
-                    for p in range(start, end, direction):
-                        if self.points[p] and self.points[p][0] == player.name:
+                    home_board_points = range(19, 25) if player.direction == 1 else range(1, 7)
+                    for p in home_board_points:
+                        if p > from_point and self.points[p] and self.points[p][0] == player.name:
                             is_highest_checker = False
                             break
                     if is_highest_checker:

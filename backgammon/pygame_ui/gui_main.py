@@ -3,7 +3,7 @@ import sys
 from backgammon.core.game import Game
 from backgammon.pygame_ui.gui_board import BoardRenderer
 from backgammon.pygame_ui.gui_events import CheckerManager
-from backgammon.pygame_ui.gui_menu import Menu
+from backgammon.pygame_ui.gui_menu import Menu, EndScreen
 
 # Configuración
 WINDOW_WIDTH = 1000
@@ -20,6 +20,7 @@ class PygameBackgammon:
         self.board_renderer = BoardRenderer(self.screen)
         self.checker_manager = CheckerManager(self.board_renderer, self.game)
         self.menu = Menu(self.screen)
+        self.end_screen = None
         self.game_state = 'MENU'
         self.dice_rolls = None
 
@@ -58,14 +59,21 @@ class PygameBackgammon:
                     self.dice_rolls = self.game.roll_dice()
                 self.checker_manager.handle_event(event)
                 if self.game.is_finished():
+                    self.end_screen = EndScreen(self.screen, self.game.winner.name)
                     self.game_state = 'GAME_OVER'
             elif self.game_state == 'GAME_OVER':
-                if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                    self.game_state = 'MENU'
+                action = self.end_screen.handle_event(event)
+                if action == 'new_game':
+                    self.restart_game()
+                elif action == 'exit':
+                    pygame.quit()
+                    sys.exit()
     
     def draw(self):
         if self.game_state == 'MENU':
             self.menu.draw()
+        elif self.game_state == 'GAME_OVER':
+            self.end_screen.draw()
         else:
             self.board_renderer.draw_board()
             self.board_renderer.draw_checkers(self.game)
@@ -75,9 +83,6 @@ class PygameBackgammon:
                 self.board_renderer.draw_legal_moves(self.checker_manager.legal_moves)
 
             self.draw_game_info()
-
-            if self.game_state == 'GAME_OVER':
-                self.draw_winner_message()
 
     def draw_game_info(self):
         font = pygame.font.SysFont("Arial", 28, bold=True)
@@ -96,14 +101,6 @@ class PygameBackgammon:
             
         dice_surf = font.render(dice_text, True, (255, 255, 255))
         self.screen.blit(dice_surf, (self.screen.get_width() / 2 - dice_surf.get_width() / 2, 15))
-
-    def draw_winner_message(self):
-        font = pygame.font.SysFont("Arial", 60, bold=True)
-        text = f"¡Gana {self.game.winner.name}!"
-        surf = font.render(text, True, (255, 215, 0))
-        rect = surf.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 2))
-        pygame.draw.rect(self.screen, (0, 0, 0, 150), rect.inflate(20, 20))
-        self.screen.blit(surf, rect)
 
 if __name__ == "__main__":
     PygameBackgammon().run()
