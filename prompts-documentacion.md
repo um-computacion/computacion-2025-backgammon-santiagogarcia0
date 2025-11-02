@@ -1,0 +1,157 @@
+PROMPTS DE DOCUMENTACIÓN
+
+yo: podrías crear la documentacion sobre la estructura que tengo hasta ahora en el proyecto?
+gemini:
+# Backgammon
+
+Autor: Santiago García
+
+Proyecto de implementación del juego Backgammon en Python.
+
+## Funcionalidades actuales
+- CLI (línea de comando)
+- Interfaz gráfica con Pygame (en desarrollo)
+- Tests unitarios
+
+## Estructura del proyecto
+/backgammon/
+├── core/           → lógica del juego
+├── cli/            → interfaz de consola
+├── pygame_ui/      → interfaz gráfica
+├── assets/         → imágenes, sonidos
+├── tests/          → tests unitarios
+└── requirements.txt
+
+## Cómo ejecutar (CLI)
+```python
+from core.game import Game
+game = Game()
+game.start_game()
+player = game.get_current_player()
+dice = game.roll_dice()
+game.next_turn()
+
+yo: podes actualizar el readme con las nuevas funcionalidades implementadas, utilizando esta base? 
+# Backgammon
+
+Autor: Santiago García
+
+Proyecto de implementación del juego Backgammon en Python.
+
+## Funcionalidades actuales
+- CLI (línea de comando)
+- Interfaz gráfica con Pygame (en desarrollo)
+- Tests unitarios
+
+## Estructura del proyecto
+/backgammon/
+├── core/           → lógica del juego
+├── cli/            → interfaz de consola
+├── pygame_ui/      → interfaz gráfica
+├── assets/         → imágenes, sonidos
+├── tests/          → tests unitarios
+└── requirements.txt
+
+## Cómo ejecutar (CLI)
+```python
+from core.game import Game
+game = Game()
+game.start_game()
+player = game.get_current_player()
+dice = game.roll_dice()
+game.next_turn()
+
+Gemini: 
+# Backgammon
+
+Autor: Santiago García
+
+Proyecto de implementación del juego Backgammon en Python.
+
+## Funcionalidades actuales
+
+- **CLI (línea de comando) interactiva**:
+  - Tirar dados
+  - Mover fichas indicando punto de origen y destino
+  - Mostrar tablero, bar y borneado
+  - Detección de victoria al bornear todas las fichas
+  - Menú simple y dinámico por turnos
+
+- **Clases centrales implementadas**:
+  - `Game`: controla flujo del juego, turnos, tiradas y condición de fin de partida
+  - `Board`: administra puntos, bar, borneado y validación de movimientos
+  - `Player`: representa a los jugadores
+  - `Dice`: simula los dados con soporte para dobles
+
+- **Reglas implementadas (simplificadas)**:
+  - Validación de movimientos según dados
+  - Movimiento obligatorio desde puntos propios
+  - Captura de fichas solitarias del oponente (hit → ficha al bar)
+  - Sistema de bar para fichas capturadas
+  - Borneado de fichas al llegar a la meta
+  - Gestión de turnos alternados y consumo de tiradas
+
+- **Pruebas unitarias**:
+  - `Board`: validación de movimientos, hits, bar y borneado
+  - `Game`: control de turnos, tiradas y condición de fin
+  - `CLI`: simulación básica de interacción con menú
+  - Cobertura ampliada para nuevas reglas
+
+## Estructura del proyecto
+/backgammon/
+├── core/           → lógica del juego (Game, Board, Player, Dice)
+├── cli/            → interfaz de consola
+├── pygame_ui/      → interfaz gráfica (en desarrollo)
+├── assets/         → recursos (imágenes, sonidos)
+├── tests/          → pruebas unitarias
+└── requirements.txt
+
+## Cómo ejecutar (CLI)
+Ejemplo simplificado para probar el flujo básico desde la consola:
+```python
+from backgammon.cli.cli import CLI
+
+cli = CLI()
+cli.start()
+
+
+yo: Podrías hacer un diagrama de clases con las entidades principales del codigo para mi archivo justificacion.md, como dice en la consigna: 
+Archivo obligatorio: JUSTIFICACION.md (Solo se aceptaran archivos en formato markdown).
+Contenido mínimo:
+Resumen del diseño general.
+Justificación de las clases elegidas (por qué, responsabilidades).
+Justificación de atributos (por qué se eligieron).
+Decisiones de diseño relevantes
+Excepciones y manejo de errores (qué excepciones definidas y por qué).
+Estrategias de testing y cobertura (qué se probó y por qué).
+Referencias a requisitos SOLID y cómo se cumplen.
+Anexos: diagramas UML(ej: diagrama de clases).
+
+gemini: ¡Por supuesto! Me parece un paso fundamental para documentar la arquitectura y las decisiones de diseño del proyecto. Crear el archivo JUSTIFICACION.md será muy útil.
+
+### Diagrama de Clases (UML en Texto)
+
+```
++----------------+          +----------------+          +----------------+
+|      Game      |<>--------|     Board      |          |      Dice      |
++----------------+          +----------------+          +----------------+
+| - board        |          | - points: dict |          | - last_roll    |
+| - dice         |          | - bar: dict    |          +----------------+
+| - players: list|          | - borne_off: dict|          | + roll()       |
+| - current_turn |          +----------------+          +----------------+
++----------------+          | + setup_board()|
+| + start_game() |          | + get_legal_moves()|
+| + roll_dice()  |          | + move_checker() |
+| + move()       |          +----------------+
+| + next_turn()  |
++----------------+
+       |
+       |<>
+       |
++----------------+
+|     Player     |
++----------------+
+| - name: str    |
+| - direction: int|
++----------------+
+```

@@ -50,5 +50,41 @@ class TestGame(unittest.TestCase):
         self.assertTrue(self.game.is_finished())
         self.assertEqual(self.game.winner.name, self.player1.name)
 
+    def test_roll_dice_doubles(self):
+        with patch.object(self.game.dice, 'roll', return_value=(3, 3)):
+            self.game.roll_dice()
+            self.assertEqual(self.game.available_moves, [3, 3, 3, 3])
+
+    def test_illegal_move(self):
+        self.game.available_moves = [1, 2]
+        self.game.board.points[24] = [self.player1.name]
+        self.assertFalse(self.game.move(24, 20))
+
+    def test_move_from_bar(self):
+        self.game.current_turn_index = 0
+        self.game.board.bar[self.player1.name] = [self.player1.name]
+        self.game.available_moves = [3, 4]
+        self.assertTrue(self.game.move("bar", 22))
+
+    def test_bear_off_non_exact(self):
+        self.game.board.points = {i: [] for i in range(1, 25)}
+        self.game.board.points[2] = [self.player1.name]
+        self.game.players[0].checkers = 1
+        self.game.board.borne_off[self.player1.name] = []
+        self.game.board.bar[self.player1.name] = []
+        self.game.available_moves = [4, 5]
+        self.assertTrue(self.game.move(2, 0))
+
+    def test_no_winner(self):
+        self.assertIsNone(self.game.winner)
+
+    def test_roll_dice_when_finished(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+        self.assertIsNone(self.game.roll_dice())
+
+    def test_move_when_finished(self):
+        self.game.board.borne_off[self.player1.name] = [self.player1.name] * 15
+        self.assertFalse(self.game.move(1, 2))
+
 if __name__ == '__main__':
     unittest.main()
