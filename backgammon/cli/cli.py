@@ -32,20 +32,27 @@ class CLI:
                 self.print_board_state()
                 print(f"Dados disponibles: {self.game.available_moves}")
                 
-                try:
-                    from_point_str = input("Mover desde (o 'bar'): ")
-                    from_point = "bar" if from_point_str == "bar" else int(from_point_str)
-                    
-                    to_point = int(input("Mover hasta: "))
+                from_point, to_point = self._get_player_move()
+                if from_point is None:
+                    continue
 
-                    if self.game.move(from_point, to_point):
-                        print("Movimiento realizado con éxito. ✅")
-                    else:
-                        print("Movimiento inválido. Inténtalo de nuevo. ❌")
-                except ValueError:
-                    print("Entrada inválida. Introduce números para los puntos.")
+                if self.game.move(from_point, to_point):
+                    print("Movimiento realizado con éxito. ✅")
+                else:
+                    print("Movimiento inválido. Inténtalo de nuevo. ❌")
         
         print(f"\n¡Felicidades, {self.game.winner.name}! Has ganado. 🏆")
+
+    def _get_player_move(self):
+        try:
+            from_point_str = input("Mover desde (o 'bar'): ")
+            from_point = "bar" if from_point_str == "bar" else int(from_point_str)
+            
+            to_point = int(input("Mover hasta: "))
+            return from_point, to_point
+        except ValueError:
+            print("Entrada inválida. Introduce números para los puntos.")
+            return None, None
 
     def print_board_state(self):
         """Imprime el estado completo del tablero."""

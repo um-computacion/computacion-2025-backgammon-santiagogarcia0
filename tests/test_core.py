@@ -36,5 +36,22 @@ class TestPlayer(unittest.TestCase):
         with self.assertRaises(ValueError):
             player.move_checker()
 
+    def test_add_checker(self):
+        player = Player("Test", 5)
+        player.add_checker()
+        self.assertEqual(player.checkers, 6)
+
+    def test_has_won_true(self):
+        player = Player("Test", 0)
+        self.assertTrue(player.has_won())
+
+    def test_has_won_false(self):
+        player = Player("Test", 1)
+        self.assertFalse(player.has_won())
+
+    def test_str_representation(self):
+        player = Player("Santiago", 15)
+        self.assertEqual(str(player), "Santiago con 15 fichas restantes")
+
 if __name__ == "__main__":
     unittest.main()

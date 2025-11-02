@@ -42,10 +42,23 @@ Proyecto de implementación del juego Backgammon en Python.
 ├── tests/          → pruebas unitarias
 └── requirements.txt
 
-## Cómo ejecutar (CLI)
-Ejemplo simplificado para probar el flujo básico desde la consola:
-```python
-from backgammon.cli.cli import CLI
+## Cómo Poner en Funcionamiento
 
-cli = CLI()
-cli.start()
+### Modo Juego
+Para jugar, ejecuta el archivo `run.py` desde la raíz del repositorio. Se te dará a elegir entre dos interfaces:
+
+1.  **Interfaz Gráfica (Pygame):** Una experiencia visual e interactiva.
+2.  **Consola (CLI):** Una versión basada en texto, ideal para entornos sin entorno gráfico.
+
+```bash
+python3 run.py
+```
+
+### Modo Testing
+Para verificar que toda la lógica del juego funciona correctamente, puedes ejecutar la suite de pruebas unitarias. Asegúrate de estar en la raíz del repositorio.
+
+El comando buscará y ejecutará todos los tests ubicados en el directorio `tests/`.
+
+```bash
+python3 -m unittest discover tests
+```
